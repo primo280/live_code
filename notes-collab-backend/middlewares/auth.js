@@ -1,24 +1,32 @@
+// middleware/auth.js
+const jwt = require('jsonwebtoken')
 const User = require('../models/User')
 
-// Middleware d'authentification simplifiée
-exports.authenticate = async (req, res, next) => {
-  try {
-    const userId = req.headers['authorization']?.split(' ')[1]
-    
-    if (!userId) {
-      return res.status(401).json({ error: 'Non autorisé' })
-    }
+module.exports = {
+  authenticate: async (req, res, next) => {
+    try {
+      const token = req.headers.authorization?.split(' ')[1]
+      
+      if (!token) {
+        return res.status(401).json({ error: 'Accès non autorisé' })
+      }
 
-    // Vérifier si l'utilisateur existe
-    const user = await User.findById(userId)
-    if (!user) {
-      return res.status(401).json({ error: 'Utilisateur non trouvé' })
-    }
+      const decoded = jwt.verify(token, process.env.JWT_SECRET)
+      const user = await User.findById(decoded.userId)
 
-    // Ajouter l'ID de l'utilisateur à la requête
-    req.userId = userId
-    next()
-  } catch (error) {
-    res.status(500).json({ error: error.message })
+      if (!user) {
+        return res.status(404).json({ error: 'Utilisateur non trouvé' })
+      }
+
+      req.userId = user._id
+      next()
+    } catch (error) {
+      console.error('Erreur d\'authentification:', error)
+      res.status(401).json({ error: 'Session invalide' })
+    }
+  },
+
+  generateToken: (userId) => {
+    return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '7d' })
   }
 }

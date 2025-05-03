@@ -1,0 +1,39 @@
+# Jenkinsfile
+pipeline {
+  agent any
+
+  environment {
+    DOCKER_IMAGE_BACKEND = "notes-backend"
+    DOCKER_IMAGE_FRONTEND = "notes-frontend"
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        git 'https://your-repo-url.git'
+      }
+    }
+
+    stage('Build Backend') {
+      steps {
+        dir('backend') {
+          sh 'docker build -t $DOCKER_IMAGE_BACKEND .'        
+        }
+      }
+    }
+
+    stage('Build Frontend') {
+      steps {
+        dir('frontend') {
+          sh 'docker build -t $DOCKER_IMAGE_FRONTEND .'
+        }
+      }
+    }
+
+    stage('Deploy with Docker Compose') {
+      steps {
+        sh 'docker-compose up -d'
+      }
+    }
+  }
+}

@@ -41,9 +41,9 @@ export default function NotesPage() {
 
     try {
       setIsLoading(true);
-      const author = localStorage.getItem('user') 
-  ? JSON.parse(localStorage.getItem('user')).username 
-  : '';
+      const userJson = localStorage.getItem('user');
+      const user = JSON.parse(userJson);
+      author = user.username || '';
       const res = await api.post('/notes', {
         title,
         content: '',

@@ -14,11 +14,13 @@ export const getNote = async (req, res) => {
 
 export const createNote = async (req, res) => {
   try {
+    console.log('Corps de la requête reçu :', req.body); // ← pour débogage
+
     const newNote = await Note.create(req.body);
 
     await Notification.create({
       message: `Note "${newNote.title}" créée`,
-      author: newNote.author, // ← Corrigé ici
+      author: newNote.author, // ← ici on vérifie bien que l'attribut existe
       createdAt: new Date(),
     });
 
@@ -28,6 +30,7 @@ export const createNote = async (req, res) => {
     res.status(500).json({ message: "Erreur lors de la création de la note" });
   }
 };
+
 
 
 export const updateNote = async (req, res) => {

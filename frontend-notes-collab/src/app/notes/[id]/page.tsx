@@ -30,9 +30,17 @@ export default function EditNotePage() {
 
   const handleSave = () => {
   if (note && note._id) {
+    let author = '';
+      if (typeof window !== 'undefined') {
+        const userJson = localStorage.getItem('user');
+        if (userJson) {
+          const user = JSON.parse(userJson);
+          author = user.username || '';
+        }
+      }
     const payload = {
       ...note,
-      author: note.author, // valeur de secours
+      author, // valeur de secours
     };
 
     api.put(`/notes/${note._id}`, payload)

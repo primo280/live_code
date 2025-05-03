@@ -11,6 +11,7 @@ export default function LoginPage() {
     const name = (e.currentTarget as any).elements.username.value;
     if (name) {
       setUsername(name);
+      localStorage.setItem('user', JSON.stringify({ username: name }));
       router.push('/notes');
     }
   };

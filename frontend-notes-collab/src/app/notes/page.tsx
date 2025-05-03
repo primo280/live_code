@@ -17,6 +17,9 @@ export default function NotesPage() {
   const [noteToDelete, setNoteToDelete] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false); // State to manage loading
   const router = useRouter();
+  const userJson = localStorage.getItem('user');
+  const username = userJson ? JSON.parse(userJson) : null;
+
 
   useEffect(() => {
     if (!username) return router.push('/');
@@ -40,8 +43,9 @@ export default function NotesPage() {
       const res = await api.post('/notes', {
         title,
         content: '',
-        tags: tags.split(',').map((tag) => tag.trim()),
         author: username,
+        tags: tags.split(',').map((tag) => tag.trim()),
+        
       });
 
       setShowModal(false);

@@ -4,6 +4,12 @@
 
 Une application web de prise de notes collaborative avec notifications en temps réel.
 
+## Démo frontend (ci-dessous)
+## https://notes-collab-frontend.vercel.app/
+
+## Documentation swagger de l'api (ci-dessous)
+## https://notes-collab-backend.up.railway.app/api-docs/
+
 ---
 
 ## 🌐 Structure du projet

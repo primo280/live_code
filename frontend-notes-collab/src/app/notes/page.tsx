@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useEffect, useState } from 'react';
 import { useUserStore } from '../../store/userStore';
@@ -15,12 +15,18 @@ export default function NotesPage() {
   const [title, setTitle] = useState('');
   const [tags, setTags] = useState('');
   const [noteToDelete, setNoteToDelete] = useState<string | null>(null);
-
+  const [isLoading, setIsLoading] = useState(false); // State to manage loading
   const router = useRouter();
 
   useEffect(() => {
     if (!username) return router.push('/');
-    api.get('/notes').then((res) => setNotes(res.data));
+    setIsLoading(true);
+    api.get('/notes')
+      .then((res) => {
+        setNotes(res.data);
+        setIsLoading(false); // Stop loading after the data is fetched
+      })
+      .catch(() => setIsLoading(false));
   }, [username]);
 
   const handleCreateNote = async () => {
@@ -30,6 +36,7 @@ export default function NotesPage() {
     }
 
     try {
+      setIsLoading(true);
       const res = await api.post('/notes', {
         title,
         content: '',
@@ -43,21 +50,22 @@ export default function NotesPage() {
       router.push(`/notes/${res.data._id}`);
     } catch (error) {
       console.error('Erreur création note:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleDeleteNote = async (noteId: string) => {
     try {
-      const res = await api.delete(`/notes/${noteId}`);
+      setIsLoading(true);
+      await api.delete(`/notes/${noteId}`);
       setNotes(notes.filter((note) => note._id !== noteId));
-      setNoteToDelete(null); // Ferme le modal
+      setNoteToDelete(null); // Close the modal
     } catch (error: any) {
-      if (error.response) {
-        console.error('Erreur lors de la suppression de la note:', error.response.data);
-      } else {
-        console.error('Erreur inconnue:', error);
-      }
+      console.error('Erreur lors de la suppression de la note:', error.response?.data || error);
       alert("Échec de la suppression. Voir console.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -69,10 +77,10 @@ export default function NotesPage() {
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-        <h1 className="text-2xl font-bold text-gray-800">📝 Mes Notes</h1>
+        <h1 className="text-4xl font-bold text-gray-800">📝 Mes Notes</h1>
         <button
           onClick={() => setShowModal(true)}
-          className="bg-blue-600 text-white px-6 py-2 rounded-xl shadow hover:bg-blue-700 transition"
+          className="bg-blue-600 text-white px-6 py-2 rounded-xl shadow-lg hover:bg-blue-700 transition duration-300 ease-in-out"
         >
           + Nouvelle note
         </button>
@@ -83,7 +91,7 @@ export default function NotesPage() {
         <input
           type="text"
           placeholder="🔍 Rechercher une note..."
-          className="p-2 w-full md:w-1/2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="p-2 w-full md:w-1/2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
           onChange={(e) => {
             const q = e.target.value;
             api.get(`/notes/search?q=${q}`).then((res) => {
@@ -98,7 +106,7 @@ export default function NotesPage() {
               setNotes(res.data);
             });
           }}
-          className="p-2 w-full md:w-1/4 border border-gray-300 rounded-lg focus:outline-none"
+          className="p-2 w-full md:w-1/4 border border-gray-300 rounded-lg focus:outline-none transition duration-300"
         >
           <option value="createdAt">📅 Trier par création</option>
           <option value="updatedAt">✏️ Trier par modification</option>
@@ -106,20 +114,18 @@ export default function NotesPage() {
         <input
           type="text"
           placeholder="🏷️ Filtrer par tag..."
-          className="p-2 w-full md:w-1/4 border border-gray-300 rounded-lg"
+          className="p-2 w-full md:w-1/4 border border-gray-300 rounded-lg transition duration-300"
           onChange={(e) => setFilter(e.target.value)}
         />
       </div>
 
- <div className="p-6 max-w-7xl mx-auto relative border-gray-900">
       <Notification />
-      {/* ... ton code existant ... */}
-    </div>
-
 
       {/* Notes List */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filtered && filtered.length > 0 ? (
+        {isLoading ? (
+          <div className="text-center text-gray-500">Chargement...</div>
+        ) : filtered && filtered.length > 0 ? (
           filtered.map((note) => (
             <div
               key={note._id}
@@ -142,14 +148,13 @@ export default function NotesPage() {
                 {note.tags.map((tag, index) => (
                   <span
                     key={index}
-                    className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full"
+                    className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full transition duration-300 ease-in-out hover:bg-blue-200"
                   >
                     #{tag}
                   </span>
                 ))}
               </div>
               <div className="mt-3 flex justify-between items-center text-gray-400 text-xs">
-                
                 <span>{new Date(note.createdAt).toLocaleDateString()}</span>
               </div>
             </div>
@@ -162,10 +167,8 @@ export default function NotesPage() {
       {/* Modal de création */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">
-              ✨ Nouvelle note
-            </h2>
+          <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md transition duration-300 ease-in-out">
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">✨ Nouvelle note</h2>
             <input
               type="text"
               placeholder="Titre de la note"
@@ -183,13 +186,13 @@ export default function NotesPage() {
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowModal(false)}
-                className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-100"
+                className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-100 transition duration-300"
               >
                 Annuler
               </button>
               <button
                 onClick={handleCreateNote}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300"
               >
                 Créer
               </button>
@@ -212,7 +215,7 @@ export default function NotesPage() {
                 Annuler
               </button>
               <button
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300"
                 onClick={() => handleDeleteNote(noteToDelete)}
               >
                 Supprimer

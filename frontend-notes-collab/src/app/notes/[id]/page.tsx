@@ -5,7 +5,6 @@ import api from '../../../lib/api';
 import { Note } from '../../../types';
 import { useSocket } from '../../../hooks/useSocket';
 import Toolbar from '../../../components/Toolbar';
-import CursorOverlay from '../../../components/CursorOverlay'; // Importation de l'overlay de curseur
 
 export default function EditNotePage() {
   const { id } = useParams();
@@ -33,7 +32,7 @@ export default function EditNotePage() {
   if (note && note._id) {
     const payload = {
       ...note,
-      author: note.author || "Auteur inconnu", // valeur de secours
+      author: "Auteur inconnu", // valeur de secours
     };
 
     api.put(`/notes/${note._id}`, payload)
@@ -105,12 +104,7 @@ export default function EditNotePage() {
         </button>
       </div>
 
-      {/* Affichage de l'overlay du curseur */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-        {Object.keys(cursorPositions).map((userId) => (
-          <CursorOverlay key={userId} position={cursorPositions[userId]} />
-        ))}
-      </div>
+      
     </div>
   );
 }

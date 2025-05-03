@@ -149,7 +149,7 @@ export default function NotesPage() {
                 ))}
               </div>
               <div className="mt-3 flex justify-between items-center text-gray-400 text-xs">
-                <span>{note.author}</span>
+                
                 <span>{new Date(note.createdAt).toLocaleDateString()}</span>
               </div>
             </div>

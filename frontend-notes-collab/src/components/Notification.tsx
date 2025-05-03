@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import { X, CheckCircle } from 'lucide-react';
 import api from '../lib/api';
+import type { Notification } from '../types'; 
 
 export default function Notification() {
-  const [notification, setNotification] = useState(null);
+  const [notification, setNotification] = useState<Notification | null>(null); // Utilise le type Notification
 
   useEffect(() => {
     // Fonction de chargement

@@ -41,6 +41,7 @@ export default function NotesPage() {
 
     try {
       setIsLoading(true);
+      const username = userJson ? JSON.parse(userJson) : null;
       const res = await api.post('/notes', {
         title,
         content: '',

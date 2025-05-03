@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import Notification from '../../components/Notification';
 
 export default function NotesPage() {
-  const { username } = useUserStore();
+  const [username, setUsername] = useState<string | null>(null);
   const { notes, setNotes } = useNoteStore();
   const [filter, setFilter] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -17,11 +17,12 @@ export default function NotesPage() {
   const [noteToDelete, setNoteToDelete] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false); // State to manage loading
   const router = useRouter();
-  const userJson = localStorage.getItem('user');
-  const username = userJson ? JSON.parse(userJson) : null;
+ 
 
 
   useEffect(() => {
+    const userJson = localStorage.getItem('user');
+    const username = userJson ? JSON.parse(userJson) : null;
     if (!username) return router.push('/');
     setIsLoading(true);
     api.get('/notes')

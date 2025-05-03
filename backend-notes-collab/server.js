@@ -71,7 +71,9 @@ mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     server.listen(process.env.PORT , () => {
-      console.log('Serveur lancé sur le port 4000');
+      const PORT=process.env.PORT;
+      console.log(`Serveur lancé sur le port ${PORT}`);
+
     });
   })
   .catch((err) => console.error(err));

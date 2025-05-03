@@ -12,7 +12,7 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:4000',
+        url: 'https://notes-collab-backend.up.railway.app',
         description: 'Serveur local',
       },
     ],

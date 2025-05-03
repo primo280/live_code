@@ -32,7 +32,7 @@ export default function EditNotePage() {
   if (note && note._id) {
     const payload = {
       ...note,
-      author: "Auteur inconnu", // valeur de secours
+      author: note.author, // valeur de secours
     };
 
     api.put(`/notes/${note._id}`, payload)

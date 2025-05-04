@@ -63,37 +63,38 @@ export default function DashboardPage() {
   }, [notes, searchQuery, selectedTags])
 
   const fetchNotes = async () => {
-    setIsLoading(true)
-    try {
-      const token = localStorage.getItem("token")
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notes`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+  setIsLoading(true)
+  try {
+    const token = localStorage.getItem("token")
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notes`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
 
-      if (!response.ok) {
-        throw new Error("Erreur lors du chargement des notes")
-      }
-
-      const data = await response.json()
-      setNotes(data)
-      setFilteredNotes(data)
-
-      // Extraire tous les tags uniques
-      const tags = Array.from(new Set(data.flatMap((note: Note) => note.tags)))
-      setAllTags(tags)
-    } catch (error) {
-      console.error("Erreur:", error)
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les notes",
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
+    if (!response.ok) {
+      throw new Error("Erreur lors du chargement des notes")
     }
+
+    const data = await response.json()
+    setNotes(data)
+    setFilteredNotes(data)
+
+    // Extraire tous les tags uniques et s'assurer que chaque tag est une chaîne de caractères
+    const tags: string[] = Array.from(new Set(data.flatMap((note: Note) => note.tags)))
+    setAllTags(tags)
+  } catch (error) {
+    console.error("Erreur:", error)
+    toast({
+      title: "Erreur",
+      description: "Impossible de charger les notes",
+      variant: "destructive",
+    })
+  } finally {
+    setIsLoading(false)
   }
+}
+
 
   const handleCreateNote = () => {
     router.push("/notes/new")

@@ -1,21 +1,30 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
-const NotificationSchema = new mongoose.Schema(
-  {
-    message: {
-      type: String,
-      required: true,
-    },
-    author: {
-      type: String,
-      required: true, // nom d'utilisateur ou ID
-    },
+const notificationSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   },
-  {
-    timestamps: true, // crée automatiquement `createdAt` et `updatedAt`
+  noteId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Note',
+    required: true
+  },
+  noteTitle: {
+    type: String,
+    required: true
+  },
+  message: {
+    type: String,
+    required: true
+  },
+  read: {
+    type: Boolean,
+    default: false
   }
-);
+}, {
+  timestamps: true
+});
 
-// Si le modèle existe déjà, ne pas le redéclarer
-export default mongoose.models.Notification ||
-  mongoose.model('Notification', NotificationSchema);
+module.exports = mongoose.model('Notification', notificationSchema);
